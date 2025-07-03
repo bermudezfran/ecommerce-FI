@@ -22,18 +22,16 @@ export const Footer = () => {
           <ul className="footer-links">
             <li><a href="/productos" className="footer-link">Productos</a></li>
             <li><a href="/carritos" className="footer-link">Mis Carritos</a></li>
-            <li><a href="/promociones" className="footer-link">Promociones</a></li>
-            <li><a href="/ayuda" className="footer-link">Ayuda</a></li>
           </ul>
         </div>
         
         <div className="footer-section">
           <h4 className="footer-subtitle">Información</h4>
           <ul className="footer-links">
-            <li><a href="/sobre-nosotros" className="footer-link">Sobre Nosotros</a></li>
-            <li><a href="/terminos" className="footer-link">Términos y Condiciones</a></li>
-            <li><a href="/privacidad" className="footer-link">Política de Privacidad</a></li>
-            <li><a href="/contacto" className="footer-link">Contacto</a></li>
+            <li className="footer-link">Sobre Nosotros</li>
+            <li className="footer-link">Términos y Condiciones</li>
+            <li className="footer-link">Política de Privacidad</li>
+            <li className="footer-link">Contacto</li>
           </ul>
         </div>
         
