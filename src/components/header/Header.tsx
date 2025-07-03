@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom'
 import './Header.css'
-
+import { useCartStore } from '../../store/cartStore'
 export const Header = () => {
+  const { currentCartId } = useCartStore()
+
   return (
+  
     <header className="header">
       <div className="header-container">
         <div className="header-left">
@@ -21,10 +24,10 @@ export const Header = () => {
         <div className="header-right">
           <div className="cart-icon">
             <span className="cart-icon-symbol">🛍️</span>
-            <span className="cart-count">0</span>
+            <span className="cart-count">{currentCartId ? '1' : "0"}</span>
           </div>
           <div className="user-menu">
-            <Link to="/auth" className="user-avatar">👤</Link>
+            <span className="user-avatar">👤</span>
           </div>
         </div>
       </div>

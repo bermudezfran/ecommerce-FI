@@ -1,14 +1,24 @@
 import { useState } from 'react'
 import { useCartStore } from '../store/cartStore'
+import { useAppStore } from '../store/appStore'
 import type { CartType } from '../types/cart'
 import './CartManager.css'
 
 export const CartManager = () => {
   const { carts, addCart, removeCart, setCurrentCart, currentCartId } = useCartStore()
-  const [selectedType, setSelectedType] = useState<CartType>('COMUN')
+  const { currentUser, isCurrentDateSpecial } = useAppStore()
+  const [selectedType, setSelectedType] = useState<CartType>('COMUN');
+  const [openModalPurchase, setOpenModalPurchase] = useState(false);
+
+  const getAutoDetectedType = (): CartType => {
+    if (currentUser.isVip) return 'VIP'
+    if (isCurrentDateSpecial) return 'FECHA_ESPECIAL'
+    return 'COMUN'
+  }
 
   const handleCreateCart = () => {
-    addCart(selectedType, 'user-1')
+    const autoType = getAutoDetectedType()
+    addCart(autoType, currentUser.id)
   }
 
   const handleSelectCart = (cartId: string) => {
@@ -32,6 +42,11 @@ export const CartManager = () => {
     <div className="cart-manager">
       <div className="create-cart-section">
         <h3>Crear Nuevo Carrito</h3>
+        <div className="auto-detection-info">
+          <p><strong>Usuario actual:</strong> {currentUser.name} {currentUser.isVip ? '(VIP)' : ''}</p>
+          <p><strong>Tipo detectado:</strong> {getAutoDetectedType()}</p>
+          {isCurrentDateSpecial && <p><strong>Fecha especial activa</strong></p>}
+        </div>
         <div className="cart-type-selector">
           <label>
             <input
@@ -80,7 +95,7 @@ export const CartManager = () => {
                 <div className="cart-info">
                   <span className="cart-type">{getCartTypeLabel(cart.type)}</span>
                   <span className="cart-id">ID: {cart.id.slice(-6)}</span>
-                  <span className="cart-items">{cart.items.length} productos</span>
+                  <span style={{cursor: 'pointer', textDecoration: 'underline', color: 'blue'}} className="cart-items" onClick={() => setOpenModalPurchase(true)}>{cart.items.length} productos</span>
                 </div>
                 <div className="cart-actions">
                   <button 
@@ -101,6 +116,23 @@ export const CartManager = () => {
           </div>
         )}
       </div>
+
+      {openModalPurchase && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>Productos en el carrito</h2>
+            <button onClick={() => setOpenModalPurchase(false)}>Cerrar</button>
+            <div className="cart-items-list">
+              {carts.find(cart => cart.id === currentCartId)?.items.map(item => (
+                <div key={item.product.id} className="cart-item">
+                  <span>{item.product.name}</span>
+                  <span>{item.quantity}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 } 
