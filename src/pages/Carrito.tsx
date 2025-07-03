@@ -1,5 +1,9 @@
+import { CartManager } from '../components/CartManager'
+
 export const Carrito = () => {
   return (
-    <div>Carrito</div>
+    <div className="carrito-page">
+      <CartManager />
+    </div>
   )
 }
