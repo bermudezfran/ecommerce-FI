@@ -24,7 +24,7 @@ export const Header = () => {
             <span className="cart-count">0</span>
           </div>
           <div className="user-menu">
-            <span className="user-avatar">👤</span>
+            <Link to="/auth" className="user-avatar">👤</Link>
           </div>
         </div>
       </div>
