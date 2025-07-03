@@ -5,7 +5,17 @@ import type { CartType } from '../types/cart'
 import './CartManager.css'
 
 export const CartManager = () => {
-  const { carts, addCart, removeCart, setCurrentCart, currentCartId } = useCartStore()
+  const { 
+    carts, 
+    addCart, 
+    removeCart, 
+    setCurrentCart, 
+    currentCartId, 
+    removeProductFromCart, 
+    updateProductQuantity, 
+    completeCart,
+    getCartTotal 
+  } = useCartStore()
   const { currentUser, isCurrentDateSpecial } = useAppStore()
   const [selectedType, setSelectedType] = useState<CartType>('COMUN');
   const [openModalPurchase, setOpenModalPurchase] = useState(false);
@@ -27,6 +37,29 @@ export const CartManager = () => {
 
   const handleRemoveCart = (cartId: string) => {
     removeCart(cartId)
+  }
+
+  const handleUpdateQuantity = (productId: string, quantity: number) => {
+    if (currentCartId) {
+      if (quantity <= 0) {
+        removeProductFromCart(currentCartId, productId)
+      } else {
+        updateProductQuantity(currentCartId, productId, quantity)
+      }
+    }
+  }
+
+  const handleRemoveProduct = (productId: string) => {
+    if (currentCartId) {
+      removeProductFromCart(currentCartId, productId)
+    }
+  }
+
+  const handleCompletePurchase = () => {
+    if (currentCartId) {
+      completeCart(currentCartId)
+      setOpenModalPurchase(false)
+    }
   }
 
   const getCartTypeLabel = (type: CartType) => {
@@ -117,22 +150,69 @@ export const CartManager = () => {
         )}
       </div>
 
-      {openModalPurchase && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <h2>Productos en el carrito</h2>
-            <button onClick={() => setOpenModalPurchase(false)}>Cerrar</button>
-            <div className="cart-items-list">
-              {carts.find(cart => cart.id === currentCartId)?.items.map(item => (
-                <div key={item.product.id} className="cart-item">
-                  <span>{item.product.name}</span>
-                  <span>{item.quantity}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+             {openModalPurchase && (
+         <div className="modal-overlay">
+           <div className="modal-content">
+             <div className="modal-header">
+               <h2>Productos en el carrito</h2>
+               <button className="close-btn" onClick={() => setOpenModalPurchase(false)}>✕</button>
+             </div>
+             
+             {currentCartId && (
+               <>
+                 <div className="cart-summary">
+                   <p><strong>Tipo:</strong> {getCartTypeLabel(carts.find(c => c.id === currentCartId)?.type || 'COMUN')}</p>
+                   <p><strong>Total:</strong> ${getCartTotal(currentCartId).toFixed(2)}</p>
+                 </div>
+                 
+                 <div className="cart-items-list">
+                   {carts.find(cart => cart.id === currentCartId)?.items.length === 0 ? (
+                     <p className="empty-cart">No hay productos en el carrito</p>
+                   ) : (
+                     carts.find(cart => cart.id === currentCartId)?.items.map(item => (
+                       <div key={item.product.id} className="cart-item-detail">
+                         <div className="item-info">
+                           <span className="item-name">{item.product.name}</span>
+                           <span className="item-price">${item.product.price}</span>
+                         </div>
+                         <div className="item-controls">
+                           <button 
+                             className="quantity-btn"
+                             onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
+                           >
+                             -
+                           </button>
+                           <span className="quantity">{item.quantity}</span>
+                           <button 
+                             className="quantity-btn"
+                             onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
+                           >
+                             +
+                           </button>
+                           <button 
+                             className="remove-btn"
+                             onClick={() => handleRemoveProduct(item.product.id)}
+                           >
+                             Eliminar
+                           </button>
+                         </div>
+                       </div>
+                     ))
+                   )}
+                 </div>
+                 
+                 {(carts.find(cart => cart.id === currentCartId)?.items.length || 0) > 0 && (
+                   <div className="modal-actions">
+                     <button className="complete-purchase-btn" onClick={handleCompletePurchase}>
+                       Completar Compra
+                     </button>
+                   </div>
+                 )}
+               </>
+             )}
+           </div>
+         </div>
+       )}
     </div>
   )
 } 
