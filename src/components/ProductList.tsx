@@ -17,6 +17,10 @@ export const ProductList = () => {
   return (
     <div className="product-list">
       <h2 className="product-list-title">Productos Disponibles</h2>
+      <div className="product-list-message">
+        {
+          !currentCartId ? "No hay carrito seleccionado, por favor seleccione un carrito" : ""
+        }</div>
       <div className="product-grid">
         {mockProducts.map(product => (
           <div key={product.id} className="product-card">
