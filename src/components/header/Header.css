@@ -8,9 +8,9 @@
 }
 
 .header-container {
-  max-width: 1200px;
+  max-width: 1700px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 40px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -69,7 +69,7 @@
 .header-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 15px;
 }
 
 .cart-icon {
@@ -79,6 +79,9 @@
   border-radius: 50%;
   transition: all 0.3s ease;
   background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .cart-icon:hover {
@@ -106,21 +109,39 @@
   font-weight: bold;
 }
 
-.user-menu {
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 50%;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.1);
+.header-right .current-user,
+.header-right .current-date {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  min-width: 180px;
 }
 
-.user-menu:hover {
+.header-right .current-user:hover,
+.header-right .current-date:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.header-right .user-name,
+.header-right .date-text {
+  color: white;
+  font-weight: 600;
+}
+
+.header-right .user-status,
+.header-right .special-date-badge {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.header-right .dropdown-arrow {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.header-right .user-avatar,
+.header-right .date-icon {
   background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.1);
-}
-
-.user-avatar {
-  font-size: 1.5rem;
+  color: white;
 }
 
 @media (max-width: 768px) {
@@ -142,6 +163,17 @@
   }
   
   .header-right {
-    gap: 8px;
+    gap: 10px;
+  }
+  
+  .header-right .current-user,
+  .header-right .current-date {
+    min-width: 150px;
+    padding: 6px 12px;
+  }
+  
+  .header-right .user-name,
+  .header-right .date-text {
+    font-size: 0.8rem;
   }
 }
