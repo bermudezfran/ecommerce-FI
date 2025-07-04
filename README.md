@@ -24,6 +24,7 @@ Implementa sistema de carritos inteligentes con detección automática de promoc
 - **React Router** - Navegación
 - **Vite** - Build tool y dev server
 - **CSS Modules** - Estilos modulares
+- **Testing** - Testeo de estados y componentes.
 
 ## 📦 Instalación
 
