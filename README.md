@@ -1,69 +1,51 @@
-# React + TypeScript + Vite
+# EcommerceFI - Prueba Técnica Frontend para Factor It
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicación de ecommerce desarrollada en React + TypeScript para challenge técnico. 
+Implementa sistema de carritos inteligentes con detección automática de promociones.
 
-Currently, two official plugins are available:
+## �� Características
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **3 tipos de carritos**: Común, Fecha Especial, VIP
+- **Detección automática** del tipo de carrito según usuario y fecha
+- **Sistema de descuentos**:
+  - 25% por comprar exactamente 4 productos
+  - $100 de descuento por más de 10 productos
+  - $300 de descuento en fechas especiales
+  - $500 + producto más barato gratis para usuarios VIP
+- **Gestión completa** de carritos y productos
+- **Datos mockeados** para simulación alojados en la carpeta 'data'
 
-## Expanding the ESLint configuration
+## ��️ Tecnologías
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **React 19** - Framework principal
+- **TypeScript** - Tipado estático
+- **Zustand** - Gestión de estado
+- **React Router** - Navegación
+- **Vite** - Build tool y dev server
+- **CSS Modules** - Estilos modulares
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📦 Instalación
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### Prerrequisitos
+- Node.js v21.4.0 o superior
+- npm o yarn
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Pasos de instalación
+
+1. **Clonar el repositorio**
+```bash
+git clone https://github.com/bermudezfran/ecommerce-FI.git
+cd ecommerce-FI
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. **Instalar dependencias**
+```bash
+npm install
 ```
+
+3. **Iniciar servidor de desarrollo**
+```bash
+npm run dev
+```
+
+4. **Abrir en navegador**
