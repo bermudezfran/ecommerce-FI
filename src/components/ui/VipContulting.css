@@ -1,0 +1,20 @@
+.consultas-vip-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.consultas-vip-container-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.consultas-vip-container-error {
+    color: red;
+}
+
+.consultas-vip-container-data {
+    color: green;
+}
