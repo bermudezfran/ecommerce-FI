@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { useCartStore } from '../store/cartStore'
 import { useAppStore } from '../store/appStore'
+import { useApi } from '../hooks/useApi'
+import { removeProductFromCart, updateCartQuantity, completePurchase } from '../services/mockApi'
+import { LoadingSpinner } from './LoadingSpinner'
 import type { CartType } from '../types/cart'
 import './CartManager.css'
 
@@ -11,7 +14,7 @@ export const CartManager = () => {
     removeCart, 
     setCurrentCart, 
     currentCartId, 
-    removeProductFromCart, 
+    removeProductFromCart: removeProductFromStore, 
     updateProductQuantity, 
     completeCart,
     getCartTotal 
@@ -19,6 +22,10 @@ export const CartManager = () => {
   const { currentUser, isCurrentDateSpecial } = useAppStore()
   const [selectedType, setSelectedType] = useState<CartType>('COMUN');
   const [openModalPurchase, setOpenModalPurchase] = useState(false);
+
+  const { execute: executeRemoveProduct, loading: removingProduct, error: removeError } = useApi(removeProductFromCart)
+  const { execute: executeUpdateQuantity, loading: updatingQuantity, error: updateError } = useApi(updateCartQuantity)
+  const { execute: executeCompletePurchase, loading: completingPurchase, error: completeError } = useApi(completePurchase)
 
   const getAutoDetectedType = (): CartType => {
     if (currentUser.isVip) return 'VIP'
@@ -39,26 +46,42 @@ export const CartManager = () => {
     removeCart(cartId)
   }
 
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
+  const handleUpdateQuantity = async (productId: string, quantity: number) => {
     if (currentCartId) {
       if (quantity <= 0) {
-        removeProductFromCart(currentCartId, productId)
+        await executeRemoveProduct(currentCartId, productId)
+        if (!removeError) {
+          removeProductFromStore(currentCartId, productId)
+        }
       } else {
-        updateProductQuantity(currentCartId, productId, quantity)
+        await executeUpdateQuantity(currentCartId, productId, quantity)
+        if (!updateError) {
+          updateProductQuantity(currentCartId, productId, quantity)
+        }
       }
     }
   }
 
-  const handleRemoveProduct = (productId: string) => {
+  const handleRemoveProduct = async (productId: string) => {
     if (currentCartId) {
-      removeProductFromCart(currentCartId, productId)
+      await executeRemoveProduct(currentCartId, productId)
+      if (!removeError) {
+        removeProductFromStore(currentCartId, productId)
+      }
     }
   }
 
-  const handleCompletePurchase = () => {
+  const handleCompletePurchase = async () => {
     if (currentCartId) {
-      completeCart(currentCartId)
-      setOpenModalPurchase(false)
+      const currentCart = carts.find(cart => cart.id === currentCartId)
+      if (currentCart && currentCart.items.length > 0) {
+        const total = getCartTotal(currentCartId)
+        await executeCompletePurchase(currentCartId, total)
+        if (!completeError) {
+          completeCart(currentCartId)
+          setOpenModalPurchase(false)
+        }
+      }
     }
   }
 
@@ -150,69 +173,80 @@ export const CartManager = () => {
         )}
       </div>
 
-             {openModalPurchase && (
-         <div className="modal-overlay">
-           <div className="modal-content">
-             <div className="modal-header">
-               <h2>Productos en el carrito</h2>
-               <button className="close-btn" onClick={() => setOpenModalPurchase(false)}>✕</button>
-             </div>
-             
-             {currentCartId && (
-               <>
-                 <div className="cart-summary">
-                   <p><strong>Tipo:</strong> {getCartTypeLabel(carts.find(c => c.id === currentCartId)?.type || 'COMUN')}</p>
-                   <p><strong>Total:</strong> ${getCartTotal(currentCartId).toFixed(2)}</p>
-                 </div>
-                 
-                 <div className="cart-items-list">
-                   {carts.find(cart => cart.id === currentCartId)?.items.length === 0 ? (
-                     <p className="empty-cart">No hay productos en el carrito</p>
-                   ) : (
-                     carts.find(cart => cart.id === currentCartId)?.items.map(item => (
-                       <div key={item.product.id} className="cart-item-detail">
-                         <div className="item-info">
-                           <span className="item-name">{item.product.name}</span>
-                           <span className="item-price">${item.product.price}</span>
-                         </div>
-                         <div className="item-controls">
-                           <button 
-                             className="quantity-btn"
-                             onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
-                           >
-                             -
-                           </button>
-                           <span className="quantity">{item.quantity}</span>
-                           <button 
-                             className="quantity-btn"
-                             onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
-                           >
-                             +
-                           </button>
-                           <button 
-                             className="remove-btn"
-                             onClick={() => handleRemoveProduct(item.product.id)}
-                           >
-                             Eliminar
-                           </button>
-                         </div>
-                       </div>
-                     ))
-                   )}
-                 </div>
-                 
-                 {(carts.find(cart => cart.id === currentCartId)?.items.length || 0) > 0 && (
-                   <div className="modal-actions">
-                     <button className="complete-purchase-btn" onClick={handleCompletePurchase}>
-                       Completar Compra
-                     </button>
-                   </div>
-                 )}
-               </>
-             )}
-           </div>
-         </div>
-       )}
+      {openModalPurchase && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Productos en el carrito</h2>
+              <button className="close-btn" onClick={() => setOpenModalPurchase(false)}>✕</button>
+            </div>
+            
+            {currentCartId && (
+              <>
+                <div className="cart-summary">
+                  <p><strong>Tipo:</strong> {getCartTypeLabel(carts.find(c => c.id === currentCartId)?.type || 'COMUN')}</p>
+                  <p><strong>Total:</strong> ${getCartTotal(currentCartId).toFixed(2)}</p>
+                </div>
+                
+                <div className="cart-items-list">
+                  {carts.find(cart => cart.id === currentCartId)?.items.length === 0 ? (
+                    <p className="empty-cart">No hay productos en el carrito</p>
+                  ) : (
+                    carts.find(cart => cart.id === currentCartId)?.items.map(item => (
+                      <div key={item.product.id} className="cart-item-detail">
+                        <div className="item-info">
+                          <span className="item-name">{item.product.name}</span>
+                          <span className="item-price">${item.product.price}</span>
+                        </div>
+                        <div className="item-controls">
+                          <button 
+                            className="quantity-btn"
+                            onClick={() => handleUpdateQuantity(item.product.id, item.quantity - 1)}
+                            disabled={updatingQuantity || removingProduct}
+                          >
+                            -
+                          </button>
+                          <span className="quantity-display">{item.quantity}</span>
+                          <button 
+                            className="quantity-btn"
+                            onClick={() => handleUpdateQuantity(item.product.id, item.quantity + 1)}
+                            disabled={updatingQuantity}
+                          >
+                            +
+                          </button>
+                          <button 
+                            className="remove-item-btn"
+                            onClick={() => handleRemoveProduct(item.product.id)}
+                            disabled={removingProduct}
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+                
+                <div className="modal-actions">
+                  <button 
+                    className="complete-purchase-btn"
+                    onClick={handleCompletePurchase}
+                    disabled={completingPurchase || !carts.find(cart => cart.id === currentCartId)?.items.length}
+                  >
+                    {completingPurchase ? <LoadingSpinner size="small" /> : 'Completar Compra'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+  
+      {(removeError || updateError || completeError) && (
+        <div className="error-message">
+          <p>Error en la operación: {removeError || updateError || completeError}</p>
+        </div>
+      )}
     </div>
   )
 } 

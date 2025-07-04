@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import './Header.css'
 import { useCartStore } from '../../store/cartStore'
+import { UserSelector } from '../ui/UserSelector'
+import { DateSelector } from '../ui/DateSelector'
 export const Header = () => {
   const { currentCartId } = useCartStore()
 
@@ -26,9 +28,8 @@ export const Header = () => {
             <span className="cart-icon-symbol">🛍️</span>
             <span className="cart-count">{currentCartId ? '1' : "0"}</span>
           </div>
-          <div className="user-menu">
-            <span className="user-avatar">👤</span>
-          </div>
+          <DateSelector />
+          <UserSelector />
         </div>
       </div>
     </header>

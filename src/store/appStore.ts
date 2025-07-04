@@ -14,7 +14,7 @@ interface AppStore {
 }
 
 export const useAppStore = create<AppStore>((set, get) => ({
-  currentUserId: 'user-1', // aclaración: aca se puede cambiar por cualquier userId para testear cualquiera de los usuarios que estan mockeados en el archivo,
+  currentUserId: 'user-2', // aclaración: aca se puede cambiar por cualquier userId para testear cualquiera de los usuarios que estan mockeados en el archivo,
   simulatedDate: new Date(),
   
   get currentUser() {
