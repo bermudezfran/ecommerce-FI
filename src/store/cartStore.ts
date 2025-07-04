@@ -14,6 +14,7 @@ interface CartStore {
   getCartTotal: (cartId: string) => number
   getCartType: (cartId: string) => CartType | null
   setCurrentCart: (cartId: string) => void
+  clearCarts: () => void
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
@@ -135,7 +136,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
       total = total - 300
     }
     
-    if (cart.type === 'VIP') {
+    if (cart.type === 'VIP' && cart.items.length > 0) {
       const minItemPrice = cart.items.reduce((min, item) => 
         item.product.price < min.product.price ? item : min
       )
@@ -152,5 +153,13 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
   setCurrentCart: (cartId: string) => {
     set({ currentCartId: cartId })
+  },
+
+  clearCarts: () => {
+    set({ carts: [], currentCartId: null })
   }
-})) 
+}))
+
+export const resetCartStore = () => {
+  useCartStore.setState({ carts: [], currentCartId: null })
+} 
