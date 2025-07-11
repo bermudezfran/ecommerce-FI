@@ -14,6 +14,7 @@ Implementa sistema de carritos inteligentes con detección automática de promoc
   - $500 + producto más barato gratis para usuarios VIP
 - **Gestión completa** de carritos y productos
 - **Datos mockeados** para simulación alojados en la carpeta 'data'
+- **Testing unitario** con jest.
 
 ## ��️ Tecnologías
 
@@ -23,6 +24,7 @@ Implementa sistema de carritos inteligentes con detección automática de promoc
 - **React Router** - Navegación
 - **Vite** - Build tool y dev server
 - **CSS Modules** - Estilos modulares
+- **Testing** - Testeo de estados y componentes.
 
 ## 📦 Instalación
 
