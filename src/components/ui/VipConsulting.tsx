@@ -8,7 +8,7 @@ import "./VipContulting.css";
 
 export const VipConsulting = () => {
   const [selectedMonth, setSelectedMonth] = useState("01");
-  const [selectedYear, setSelectedYear] = useState("2024");
+  const [selectedYear, setSelectedYear] = useState("2025");
 
   const {
     execute: executeVipUsers,
@@ -161,6 +161,7 @@ export const VipConsulting = () => {
                 onChange={(e) => setSelectedYear(e.target.value)}
                 className="year-select"
               >
+                <option value="2025">2025</option>
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
                 <option value="2022">2022</option>
