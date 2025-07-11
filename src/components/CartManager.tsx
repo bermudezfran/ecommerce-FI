@@ -6,6 +6,8 @@ import { removeProductFromCart, updateCartQuantity, completePurchase } from '../
 import { LoadingSpinner } from './LoadingSpinner'
 import type { CartType } from '../types/cart'
 import './CartManager.css'
+import { mockUsers } from '../data/mockUsers'
+import { isSpecialDate } from '../data/mockDates'
 
 export const CartManager = () => {
   const { 
@@ -17,10 +19,12 @@ export const CartManager = () => {
     removeProductFromCart: removeProductFromStore, 
     updateProductQuantity, 
     completeCart,
-    getCartTotal 
+    getCartTotal,
+    clearCartId 
   } = useCartStore()
-  const { currentUser, isCurrentDateSpecial } = useAppStore()
-  const [selectedType, setSelectedType] = useState<CartType>('COMUN');
+  const { currentUser, currentUserId } = useAppStore()
+  const simulateDate = useAppStore(s => s.simulatedDate);
+  const currentUserName = mockUsers.find(user => user.id === currentUserId)
   const [openModalPurchase, setOpenModalPurchase] = useState(false);
 
   const { execute: executeRemoveProduct, loading: removingProduct, error: removeError } = useApi(removeProductFromCart)
@@ -28,8 +32,8 @@ export const CartManager = () => {
   const { execute: executeCompletePurchase, loading: completingPurchase, error: completeError } = useApi(completePurchase)
 
   const getAutoDetectedType = (): CartType => {
-    if (currentUser.isVip) return 'VIP'
-    if (isCurrentDateSpecial) return 'FECHA_ESPECIAL'
+    if (currentUserName?.isVip) return 'VIP'
+    if (isSpecialDate(simulateDate)) return 'FECHA_ESPECIAL'
     return 'COMUN'
   }
 
@@ -71,15 +75,16 @@ export const CartManager = () => {
     }
   }
 
-  const handleCompletePurchase = async () => {
-    if (currentCartId) {
-      const currentCart = carts.find(cart => cart.id === currentCartId)
+  const handleCompletePurchase = async (cartId: string) => {
+    if (cartId) {
+      const currentCart = carts.find(cart => cart.id === cartId)
       if (currentCart && currentCart.items.length > 0) {
-        const total = getCartTotal(currentCartId)
-        await executeCompletePurchase(currentCartId, total)
+        const total = getCartTotal(cartId)
+        await executeCompletePurchase(cartId, total)
         if (!completeError) {
-          completeCart(currentCartId)
+          completeCart(cartId)
           setOpenModalPurchase(false)
+          clearCartId(cartId)
         }
       }
     }
@@ -99,38 +104,9 @@ export const CartManager = () => {
       <div className="create-cart-section">
         <h3>Crear Nuevo Carrito</h3>
         <div className="auto-detection-info">
-          <p><strong>Usuario actual:</strong> {currentUser.name} {currentUser.isVip ? '(VIP)' : ''}</p>
+          <p><strong>Usuario actual:</strong> {currentUserName?.name} {currentUserName?.isVip ? '(VIP)' : ''}</p>
           <p><strong>Tipo detectado:</strong> {getAutoDetectedType()}</p>
-          {isCurrentDateSpecial && <p><strong>Fecha especial activa</strong></p>}
-        </div>
-        <div className="cart-type-selector">
-          <label>
-            <input
-              type="radio"
-              value="COMUN"
-              checked={selectedType === 'COMUN'}
-              onChange={(e) => setSelectedType(e.target.value as CartType)}
-            />
-            Común
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="FECHA_ESPECIAL"
-              checked={selectedType === 'FECHA_ESPECIAL'}
-              onChange={(e) => setSelectedType(e.target.value as CartType)}
-            />
-            Fecha Especial
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="VIP"
-              checked={selectedType === 'VIP'}
-              onChange={(e) => setSelectedType(e.target.value as CartType)}
-            />
-            VIP
-          </label>
+          {isSpecialDate(simulateDate) && <p><strong>Fecha especial activa</strong></p>}
         </div>
         <button className="create-cart-btn" onClick={handleCreateCart}>
           Crear Carrito
@@ -230,7 +206,7 @@ export const CartManager = () => {
                 <div className="modal-actions">
                   <button 
                     className="complete-purchase-btn"
-                    onClick={handleCompletePurchase}
+                    onClick={() => handleCompletePurchase(currentCartId)}
                     disabled={completingPurchase || !carts.find(cart => cart.id === currentCartId)?.items.length}
                   >
                     {completingPurchase ? <LoadingSpinner size="small" /> : 'Completar Compra'}

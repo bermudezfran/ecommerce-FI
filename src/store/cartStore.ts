@@ -15,6 +15,7 @@ interface CartStore {
   getCartType: (cartId: string) => CartType | null
   setCurrentCart: (cartId: string) => void
   clearCarts: () => void
+  clearCartId: (cartId: string) => void
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
@@ -157,6 +158,13 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
   clearCarts: () => {
     set({ carts: [], currentCartId: null })
+  },
+
+  clearCartId: (cartId: string) => {
+    set(state => ({
+      carts: state.carts.filter(cart => cart.id !== cartId),
+      currentCartId: state.currentCartId === cartId ? null : state.currentCartId
+    }))
   }
 }))
 

@@ -4,7 +4,8 @@ import { mockUsers } from '../../data/mockUsers'
 import './UserSelector.css'
 
 export const UserSelector = () => {
-  const { currentUser, setCurrentUser } = useAppStore()
+  const { currentUserId, setCurrentUser } = useAppStore()
+  const currentUser = mockUsers.find(user => user.id === currentUserId)
   const [isOpen, setIsOpen] = useState(false)
 
   const handleUserChange = (userId: string) => {
@@ -18,9 +19,9 @@ export const UserSelector = () => {
         <div className="user-info">
           <span className="user-avatar">👤</span>
           <div className="user-details">
-            <span className="user-name">{currentUser.name}</span>
+            <span className="user-name">{currentUser?.name}</span>
             <span className="user-status">
-              {currentUser.isVip ? 'VIP' : 'Común'}
+              {currentUser?.isVip ? 'VIP' : 'Común'}
             </span>
           </div>
         </div>
@@ -43,7 +44,7 @@ export const UserSelector = () => {
             {mockUsers.map(user => (
               <div
                 key={user.id}
-                className={`user-option ${currentUser.id === user.id ? 'selected' : ''}`}
+                className={`user-option ${currentUser?.id === user.id ? 'selected' : ''}`}
                 onClick={() => handleUserChange(user.id)}
               >
                 <div className="user-option-info">
