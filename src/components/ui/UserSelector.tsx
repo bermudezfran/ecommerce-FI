@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useAppStore } from '../../store/appStore'
-import { mockUsers } from '../../data/mockUsers'
+import type { User } from '../../types/user'
 import './UserSelector.css'
 
 export const UserSelector = () => {
+  const users = useAppStore(s => s.users)
   const { currentUserId, setCurrentUser } = useAppStore()
-  const currentUser = mockUsers.find(user => user.id === currentUserId)
+  const currentUser = users.find((user: User) => user.id === currentUserId)
   const [isOpen, setIsOpen] = useState(false)
 
   const handleUserChange = (userId: string) => {
@@ -19,8 +20,8 @@ export const UserSelector = () => {
         <div className="user-info">
           <span className="user-avatar">👤</span>
           <div className="user-details">
-            <span className="user-name">{currentUser?.name}</span>
-            <span className="user-status">
+            <span className="user-name">{currentUser?.name || 'Usuario'}</span>
+            <span className="user-status">  
               {currentUser?.isVip ? 'VIP' : 'Común'}
             </span>
           </div>
@@ -41,7 +42,7 @@ export const UserSelector = () => {
           </div>
           
           <div className="users-list">
-            {mockUsers.map(user => (
+            {users.map((user: User) => (
               <div
                 key={user.id}
                 className={`user-option ${currentUser?.id === user.id ? 'selected' : ''}`}
@@ -61,4 +62,4 @@ export const UserSelector = () => {
       )}
     </div>
   )
-} 
+}

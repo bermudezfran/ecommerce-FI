@@ -6,7 +6,6 @@ import { removeProductFromCart, updateCartQuantity, completePurchase } from '../
 import { LoadingSpinner } from './LoadingSpinner'
 import type { CartType } from '../types/cart'
 import './CartManager.css'
-import { mockUsers } from '../data/mockUsers'
 import { isSpecialDate } from '../data/mockDates'
 
 export const CartManager = () => {
@@ -22,18 +21,25 @@ export const CartManager = () => {
     getCartTotal,
     clearCartId 
   } = useCartStore()
-  const { currentUser, currentUserId } = useAppStore()
-  const simulateDate = useAppStore(s => s.simulatedDate);
-  const currentUserName = mockUsers.find(user => user.id === currentUserId)
+
+  const { 
+    currentUser,
+    currentUserId, 
+    simulatedDate,
+    addPurchaseToHistory, 
+    updateUserVipStatus 
+  } = useAppStore()
+  const user = useAppStore(s => s.users.find(u => u.id === currentUserId))
   const [openModalPurchase, setOpenModalPurchase] = useState(false);
+  const [showVipPopup, setShowVipPopup] = useState(false);
 
   const { execute: executeRemoveProduct, loading: removingProduct, error: removeError } = useApi(removeProductFromCart)
   const { execute: executeUpdateQuantity, loading: updatingQuantity, error: updateError } = useApi(updateCartQuantity)
   const { execute: executeCompletePurchase, loading: completingPurchase, error: completeError } = useApi(completePurchase)
 
   const getAutoDetectedType = (): CartType => {
-    if (currentUserName?.isVip) return 'VIP'
-    if (isSpecialDate(simulateDate)) return 'FECHA_ESPECIAL'
+    if (currentUser?.isVip) return 'VIP'
+    if (isSpecialDate(simulatedDate)) return 'FECHA_ESPECIAL'
     return 'COMUN'
   }
 
@@ -76,16 +82,27 @@ export const CartManager = () => {
   }
 
   const handleCompletePurchase = async (cartId: string) => {
-    if (cartId) {
-      const currentCart = carts.find(cart => cart.id === cartId)
-      if (currentCart && currentCart.items.length > 0) {
-        const total = getCartTotal(cartId)
-        await executeCompletePurchase(cartId, total)
-        if (!completeError) {
-          completeCart(cartId)
-          setOpenModalPurchase(false)
-          clearCartId(cartId)
+    const currentCart = carts.find(cart => cart.id === cartId)
+    if (currentCart && currentCart.items.length > 0 && user) {
+      const totalPaid = getCartTotal(cartId)
+      
+      await executeCompletePurchase(cartId, totalPaid)
+      
+      if (!completeError) {
+        addPurchaseToHistory(user.id, {
+          cartId: cartId,
+          amountPaid: totalPaid,
+          date: simulatedDate
+        })
+        
+        if (totalPaid > 10000 && !user.isVip) {
+          updateUserVipStatus(user.id, true)
+          setShowVipPopup(true)
         }
+        
+        completeCart(cartId)
+        setOpenModalPurchase(false)
+        clearCartId(cartId)
       }
     }
   }
@@ -104,9 +121,9 @@ export const CartManager = () => {
       <div className="create-cart-section">
         <h3>Crear Nuevo Carrito</h3>
         <div className="auto-detection-info">
-          <p><strong>Usuario actual:</strong> {currentUserName?.name} {currentUserName?.isVip ? '(VIP)' : ''}</p>
-          <p><strong>Tipo detectado:</strong> {getAutoDetectedType()}</p>
-          {isSpecialDate(simulateDate) && <p><strong>Fecha especial activa</strong></p>}
+          <p><strong>Usuario actual:</strong> {user?.name}</p>
+          {isSpecialDate(simulatedDate) && <p><strong>Fecha especial activa</strong></p>}
+          <p><strong>Tipo detectado:</strong> {user?.isVip ? 'VIP' : 'Común'}</p>
         </div>
         <button className="create-cart-btn" onClick={handleCreateCart}>
           Crear Carrito
@@ -148,6 +165,25 @@ export const CartManager = () => {
           </div>
         )}
       </div>
+      
+      {showVipPopup && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>¡Felicitaciones! 🥳</h2>
+              <button className="close-btn" onClick={() => setShowVipPopup(false)}>✕</button>
+            </div>
+            <div style={{ padding: '20px', textAlign: 'center' }}>
+              <p>Tu compra superó los $10.000.</p>
+              <p><strong>¡Ahora es un cliente VIP!</strong></p>
+              <p>Disfrutarás de beneficios exclusivos en tu próxima compra.</p>
+              <button className="complete-purchase-btn" onClick={() => setShowVipPopup(false)}>
+                ¡Entendido!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {openModalPurchase && (
         <div className="modal-overlay">
@@ -217,7 +253,7 @@ export const CartManager = () => {
           </div>
         </div>
       )}
-  
+
       {(removeError || updateError || completeError) && (
         <div className="error-message">
           <p>Error en la operación: {removeError || updateError || completeError}</p>
@@ -225,4 +261,4 @@ export const CartManager = () => {
       )}
     </div>
   )
-} 
+}

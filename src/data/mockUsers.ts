@@ -10,7 +10,7 @@ export const mockUsers: User[] = [
   {
     id: 'user-2',
     name: 'María García',
-    isVip: true,
+    isVip: false,
     purchaseHistory: [
       {
         cartId: 'cart-001',
@@ -39,7 +39,7 @@ export const mockUsers: User[] = [
   {
     id: 'user-4',
     name: 'Ana Rodríguez',
-    isVip: true,
+    isVip: false,
     purchaseHistory: [
       {
         cartId: 'cart-004',

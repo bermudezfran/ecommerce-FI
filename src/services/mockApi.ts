@@ -6,8 +6,8 @@ import type {
   SpecialDateResponse 
 } from '../types/apiTypes'
 import type { Product } from '../types/product'
-import { mockUsers } from '../data/mockUsers'
 import { specialDates } from '../data/mockDates'
+import { useAppStore } from '../store/appStore'
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -110,8 +110,8 @@ export const getVipUsers = async (): Promise<ApiResponse<VipUserResponse>> => {
   if (simulateError(0.05)) {
     throw new Error('Error al obtener usuarios VIP')
   }
-
-  const vipUsers = mockUsers.filter(user => user.isVip)
+  const { users } = useAppStore.getState()
+  const vipUsers = users.filter(user => user.isVip)
   
   return {
     success: true,
@@ -150,7 +150,8 @@ export const getUsersByVipStatus = async (
     throw new Error('Error al obtener usuarios por estado VIP')
   }
 
-  const filteredUsers = mockUsers.filter(user => {
+  const { users } = useAppStore.getState()
+  const filteredUsers = users.filter(user => {  
     const hasPurchaseInMonth = user.purchaseHistory.some(purchase => {
       const purchaseDate = new Date(purchase.date)
       return purchaseDate.getMonth() === parseInt(month) - 1 && 
