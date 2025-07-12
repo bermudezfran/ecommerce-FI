@@ -123,7 +123,7 @@ export const CartManager = () => {
         <div className="auto-detection-info">
           <p><strong>Usuario actual:</strong> {user?.name}</p>
           {isSpecialDate(simulatedDate) && <p><strong>Fecha especial activa</strong></p>}
-          <p><strong>Tipo detectado:</strong> {user?.isVip ? 'VIP' : 'Común'}</p>
+          <p><strong>Tipo detectado:</strong> {isSpecialDate(simulatedDate) ? 'Fecha Especial' : user?.isVip ? 'VIP' : 'Común'}</p>
         </div>
         <button className="create-cart-btn" onClick={handleCreateCart}>
           Crear Carrito
@@ -142,7 +142,7 @@ export const CartManager = () => {
                 className={`cart-item ${currentCartId === cart.id ? 'active' : ''}`}
               >
                 <div className="cart-info">
-                  <span className="cart-type">{getCartTypeLabel(cart.type)}</span>
+                  <span className="cart-type">{isSpecialDate(simulatedDate) ? 'Fecha Especial' : user?.isVip ? 'VIP' : 'Común'}</span>
                   <span className="cart-id">ID: {cart.id.slice(-6)}</span>
                   <span style={{cursor: 'pointer', textDecoration: 'underline', color: 'blue'}} className="cart-items" onClick={() => setOpenModalPurchase(true)}>{cart.items.length} productos</span>
                 </div>
